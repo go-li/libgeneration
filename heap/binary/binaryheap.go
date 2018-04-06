@@ -1,14 +1,14 @@
 // Package binary implements binary heap
 package binary
 
-func percolateUp(array *[], hole int, val *, cmp func(*, *) int) (next int) {
+func percolateUp(array [], hole int, val *, cmp func(*, *) int) (next int) {
 	for {
 		next = ((hole + 1) >> 1) - 1
-		if !((hole > 0) && (cmp(val, &(*array)[next]) < 0)) {
+		if !((hole > 0) && (cmp(val, &(array)[next]) < 0)) {
 			break
 		}
-		var l = &(*array)[hole]
-		var r = &(*array)[next]
+		var l = &(array)[hole]
+		var r = &(array)[next]
 		*l = *r
 		hole = next
 	}
@@ -25,7 +25,7 @@ func Insert(array *[], add [], cmp func(*, *) int) {
 	}
 	for i := range add {
 		var q = &add[i]
-		var p = &(*array)[percolateUp(array, len(*array)-1, q, cmp)]
+		var p = &(*array)[percolateUp(*array, len(*array)-1, q, cmp)]
 
 		*p = *q
 	}
@@ -69,4 +69,46 @@ func down(array [], i0 int, tmp *, cmp func(*, *) int) bool {
 		i = j
 	}
 	return i > i0
+}
+
+func Fix(array [], i int, cmp func(*, *) int) {
+	var temp *
+	if len(array) >= cap(array) {
+		var tmp []
+		tmp = make([], 1)
+		temp = &tmp[0]
+	} else {
+		temp = &(array[0 : len(array)+1])[len(array)]
+	}
+	if !down(array, i, temp, cmp) {
+		percolateUp(array, i, temp, cmp)
+	}
+}
+
+func Pop(array *[], cmp func(*, *) int) * {
+	if len(*array) == 0 {
+		return nil
+	}
+	var temp *
+	if len(*array) >= cap(*array) {
+		var tmp []
+		tmp = make([], 1)
+		temp = &tmp[0]
+	} else {
+		temp = &((*array)[0 : len(*array)+1])[len(*array)]
+	}
+	var p *
+	p = &(*array)[0]
+	var q *
+	q = &(*array)[len(*array)-1]
+
+	*temp = *p
+	*p = *q
+	*q = *temp
+
+	*array = (*array)[0 : len(*array)-1]
+
+	down(*array, 0, temp, cmp)
+
+	return q
 }
