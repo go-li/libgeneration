@@ -16,6 +16,9 @@ func percolateUp(array [], hole int, val *, cmp func(*, *) int) (next int) {
 }
 
 func Insert(array *[], add [], cmp func(*, *) int) {
+	if len(add) == 0 {
+		return
+	}
 	if len(*array)+len(add) <= cap(*array) {
 		*array = (*array)[0 : len(*array)+len(add)]
 	} else if cap(*array) > 0 {
@@ -25,7 +28,7 @@ func Insert(array *[], add [], cmp func(*, *) int) {
 	}
 	for i := range add {
 		var q = &add[i]
-		var p = &(*array)[percolateUp(*array, len(*array)-1, q, cmp)]
+		var p = &(*array)[percolateUp(*array, len(*array)-len(add)+i, q, cmp)]
 
 		*p = *q
 	}
