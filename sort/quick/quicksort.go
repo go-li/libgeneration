@@ -1,4 +1,4 @@
-package main
+package quick
 
 var Seed uint32 = 1701105312
 var Cutoff int = 20
