@@ -84,7 +84,7 @@ func Fix(array [], i int, cmp func(*, *) int) {
 		temp = &(array[0 : len(array)+1])[len(array)]
 	}
 	if !down(array, i, temp, cmp) {
-		percolateUp(array, i, temp, cmp)
+		percolateUp(array, i, &array[i], cmp)
 	}
 }
 
@@ -114,4 +114,27 @@ func Pop(array *[], cmp func(*, *) int) * {
 	down(*array, 0, temp, cmp)
 
 	return q
+}
+
+func Is(array [], cmp func(*, *) int) bool {
+	for i := range array {
+		if (len(array) > 2*i+1) && (cmp(&array[2*i+1], &array[i]) < 0) {
+			return false
+		}
+		if (len(array) > 2*i+2) && (cmp(&array[2*i+2], &array[i]) < 0) {
+			return false
+		}
+	}
+	return true
+}
+
+func Peek(array [], _ func(*, *) int) * {
+	if len(array) == 0 {
+		return nil
+	}
+	return &array[0]
+}
+
+func Len(array []) int {
+	return len(array)
 }
