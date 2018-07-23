@@ -80,3 +80,9 @@ func (sg SparseGraph) Modify(graph *DataSparseGraph) {
 	graph[2] = make(map[int][]int)
 
 }
+
+func (sg SparseGraph) Each(graph *DataSparseGraph, callback func(int)) {
+	for i := range graph[0] {
+		callback(i)
+	}
+}

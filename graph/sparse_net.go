@@ -89,3 +89,9 @@ func (sg SparseNet) Modify(graph *DataSparseNet) {
 	graph[2] = make(map[int][]adjacency)
 
 }
+
+func (sg SparseNet) Each(graph *DataSparseNet, callback func(int)) {
+	for i := range graph[0] {
+		callback(i)
+	}
+}
