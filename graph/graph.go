@@ -26,7 +26,7 @@ func HasEdge(d float64, _ int) bool {
 	return IsEdge(d)
 }
 
-func ForeachEdge(g Graph, graph_data *, callback func (i int, j int, d float64)) {
+func ForeachEdge(g Graph, graph_data *, callback func (int, int, float64)) {
 
 	g.Each(graph_data, func(i int) {
 		var j = 0
@@ -53,4 +53,28 @@ func ForeachEdge(g Graph, graph_data *, callback func (i int, j int, d float64))
 		}
 	})
 
+}
+
+func ForeachEdgeFrom(i int, g Graph, graph_data *, callback func (int, int, float64)) {
+	var j = 0
+	var j2 = 0
+	var d float64
+	for {
+		d, j2 = g.Get(i, j, graph_data)
+		if !IsEdge(d) {
+			j = j2
+			if j2 < 0 {
+				break
+			}
+			continue
+		}
+
+		callback(i, j, d)
+
+		if j2 < 0 {
+			break
+		}
+
+		j = j2
+	}
 }

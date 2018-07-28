@@ -18,12 +18,7 @@ type intNode struct {
 	full_heap  []int
 }
 
-func Sort(New func(*) *,
-	Get func(int, int, *) (float64, int),
-	Set func(int, int, float64, *),
-	Modify func(*),
-	Each func(*, func(int)),
-	graph_data *) (out []int) {
+func Sort(api graph.Graph, graph_data *) (out []int) {
 
 	var incoming []int
 
@@ -31,21 +26,7 @@ func Sort(New func(*) *,
 
 	var root intRoot
 
-	Each(graph_data, func (i int){
-
-		var j = 0
-		var j2 = 0
-		var d float64
-
-		for {
-			d, j2 = Get(i, j, graph_data)
-			if !graph.IsEdge(d) {
-				j = j2
-				if j2 < 0 {
-					break
-				}
-				continue
-			}
+	graph.ForeachEdge(api, graph_data, func(i int, j int, d float64) {
 //			print("from ")
 //			print(i)
 //			print(" to ")
@@ -61,15 +42,6 @@ func Sort(New func(*) *,
 
 			incoming[j]++
 
-			if j2 < 0 {
-				return
-			}
-
-
-
-
-			j = j2
-		}
 
 	})
 
@@ -102,19 +74,8 @@ func Sort(New func(*) *,
 		out = append(out, u)
 
 
-		var j = 0
-		var j2 = 0
-		var d float64
+		graph.ForeachEdgeFrom(u, api, graph_data, func(_ int, j int, d float64) {
 
-		for {
-			d, j2 = Get(u, j, graph_data)
-			if !graph.IsEdge(d) {
-				j = j2
-				if j2 < 0 {
-					break
-				}
-				continue
-			}
 //			print("from ")
 //			print(u)
 //			print(" to ")
@@ -134,12 +95,8 @@ func Sort(New func(*) *,
 			}
 
 
-			if j2 < 0 {
-				break
-			}
+		})
 
-			j = j2
-		}
 
 		visited_nodes++
 
