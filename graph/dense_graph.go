@@ -4,6 +4,14 @@ import "math"
 
 type DenseGraph struct{}
 
+type ApiDenseGraph interface {
+	New(*DataDenseGraph) *DataDenseGraph
+	Get(int, int, *DataDenseGraph) (float64, int)
+	Set(int, int, float64, *DataDenseGraph)
+	Modify(*DataDenseGraph)
+	Each(*DataDenseGraph, func(int))
+}
+
 type DataDenseGraph = struct {
 	upper    []byte
 	diagonal []byte

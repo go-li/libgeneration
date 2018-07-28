@@ -14,6 +14,14 @@ func cmp_adj(a, b *adjacency) int {
 
 type SparseNet struct{}
 
+type ApiSparseNet interface {
+	New(*DataSparseNet) *DataSparseNet
+	Get(int, int, *DataSparseNet) (float64, int)
+	Set(int, int, float64, *DataSparseNet)
+	Modify(*DataSparseNet)
+	Each(*DataSparseNet, func(int))
+}
+
 type DataSparseNet = [3]map[int][]adjacency
 
 func (sg SparseNet) New(graph *DataSparseNet) *DataSparseNet {

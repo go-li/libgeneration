@@ -5,6 +5,14 @@ import "github.com/go-li/libgeneration/sort/quick"
 
 type SparseGraph struct{}
 
+type ApiSparseGraph interface {
+	New(*DataSparseGraph) *DataSparseGraph
+	Get(int, int, *DataSparseGraph) (float64, int)
+	Set(int, int, float64, *DataSparseGraph)
+	Modify(*DataSparseGraph)
+	Each(*DataSparseGraph, func(int))
+}
+
 type DataSparseGraph = [3]map[int][]int
 
 func (sg SparseGraph) New(graph *DataSparseGraph) *DataSparseGraph {
