@@ -1,0 +1,12 @@
+// Package ternary implements ternary if expression
+package ternary
+func If[T](b bool, args ...T)(*T){
+if (b){
+return &args[0]
+} else
+if (len(args) >= 2){
+return &args[1]
+}
+return nil
+}
+

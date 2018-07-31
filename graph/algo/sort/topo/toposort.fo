@@ -1,0 +1,80 @@
+package topo
+import "github.com/go-li/libgeneration/graph"
+import heap "github.com/go-li/libgeneration/heap/tree"
+func cmp_int(a, b *int)(int){
+return *a - *b
+}
+
+type intRoot struct{
+full_heaps_tree *intNode
+working_heap []int
+length int
+}
+
+type intNode struct{
+order_link [2]*intNode
+full_heap []int
+}
+
+func Sort[T](api graph.Graph, graph_data *T)(out []int){
+var incoming []int 
+var visited_nodes = 0 
+var root intRoot 
+graph.ForeachEdge(api,graph_data,func(i int, j int, d float64){
+for (j >= len(incoming)){
+incoming = append(incoming,0) 
+}
+for (i >= len(incoming)){
+incoming = append(incoming,0) 
+}
+incoming[j]++
+})
+for i := range (incoming) {
+if (incoming[i] == 0){
+var sli = [1]int{i} 
+heap.Insert(&root,sli[0:],cmp_int)
+}
+}
+for {
+var ptr = heap.Pop(&root,cmp_int) 
+if (ptr == nil){
+return out
+}
+var u = *ptr 
+out = append(out,u) 
+graph.ForeachEdgeFrom(u,api,graph_data,func(_ int, j int, d float64){
+incoming[j]--
+if (incoming[j] == 0){
+var sli = [1]int{j} 
+heap.Insert(&root,sli[0:],cmp_int)
+}
+})
+visited_nodes++
+}
+if (visited_nodes != len(incoming)){
+return nil
+}
+return out
+}
+
+//			print("from ")
+//			print(i)
+//			print(" to ")
+//			print(j)
+//			println("")
+
+//	println("--")
+
+//			print(" adding ")
+//			println(i)
+//	println("--")
+
+//		print("popped ")
+
+//		println(u)
+
+//			print("from ")
+//			print(u)
+//			print(" to ")
+//			print(j)
+//			println("")

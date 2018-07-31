@@ -1,0 +1,30 @@
+package search
+import "github.com/go-li/libgeneration/graph"
+func Depth[T](from []int, visited map[int]struct{}, api graph.Graph, graph_data *T, vertex func(int), edge func(int, int, float64)){
+if (visited == nil){
+visited = make(map[int]struct{}) 
+}
+for (len(from) > 0){
+at := from[0] 
+if (vertex != nil){
+vertex(at)
+}
+visited[at] = struct{}{} 
+from = from[1:] 
+var add []int 
+graph.ForeachEdgeFrom(at,api,graph_data,func(i int, j int, d float64){
+if _, ok := visited[j] ;(ok){
+return 
+}
+if (edge != nil){
+edge(i,j,d)
+}
+add = append(add,j) 
+})
+from = append(add,from...) 
+}
+}
+
+
+//		print("at ")
+//		println(at)
