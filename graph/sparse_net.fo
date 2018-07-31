@@ -58,21 +58,39 @@ graph[1][from] = append(graph[1][from],adjacency{to, edge})
 func (sg SparseNet) Modify(graph *DataSparseNet){
 for n, s := range (graph[0]) {
 deletion := graph[1][n] 
-quick.Sort(deletion,cmp_adj)
+quick.Sort[struct{
+target int
+distance float64
+}](deletion,cmp_adj)
 graph[1][n] = deletion 
-s = sorted_sorted_delete[struct{target intdistance float64}](s,deletion,cmp_adj) 
+s = sorted_sorted_delete[struct{
+target int
+distance float64
+}](s,deletion,cmp_adj) 
 var temp adjacency 
-adaptive_sort[struct{target intdistance float64}](s,&temp,cmp_adj)
+adaptive_sort[struct{
+target int
+distance float64
+}](s,&temp,cmp_adj)
 deletion = graph[2][n] 
-quick.Sort(deletion,cmp_adj)
-s = sorted_sorted_delete[struct{target intdistance float64}](s,deletion,cmp_adj) 
+quick.Sort[struct{
+target int
+distance float64
+}](deletion,cmp_adj)
+s = sorted_sorted_delete[struct{
+target int
+distance float64
+}](s,deletion,cmp_adj) 
 graph[0][n] = s 
 }
 for n, s := range (graph[1]) {
 var lg = len(graph[0][n]) 
 graph[0][n] = append(graph[0][n],s...) 
 if (len(s) != 0 && lg != 0){
-quick.Sort(graph[0][n],cmp_adj)
+quick.Sort[struct{
+target int
+distance float64
+}](graph[0][n],cmp_adj)
 }
 }
 graph[1] = make(map[int][]adjacency) 

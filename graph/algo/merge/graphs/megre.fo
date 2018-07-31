@@ -6,7 +6,7 @@ return nil
 }
 merged_graph_data = api.New(graphs_datas[0]) 
 for g := range (graphs_datas) {
-graph.ForeachEdge(api,graphs_datas[g],func(i int, j int, d float64){
+graph.ForeachEdge[T](api,graphs_datas[g],func(i int, j int, d float64){
 api.Set(i,j,d,merged_graph_data)
 })
 }

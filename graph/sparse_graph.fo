@@ -49,13 +49,13 @@ graph[1][from] = append(graph[1][from],to)
 func (sg SparseGraph) Modify(graph *DataSparseGraph){
 for n, s := range (graph[0]) {
 deletion := graph[1][n] 
-quick.Sort(deletion,cmp_ints)
+quick.Sort[int](deletion,cmp_ints)
 graph[1][n] = deletion 
 s = sorted_sorted_delete[int](s,deletion,cmp_ints) 
 var temp int 
 adaptive_sort[int](s,&temp,cmp_ints)
 deletion = graph[2][n] 
-quick.Sort(deletion,cmp_ints)
+quick.Sort[int](deletion,cmp_ints)
 s = sorted_sorted_delete[int](s,deletion,cmp_ints) 
 graph[0][n] = s 
 }
@@ -63,7 +63,7 @@ for n, s := range (graph[1]) {
 var lg = len(graph[0][n]) 
 graph[0][n] = append(graph[0][n],s...) 
 if (len(s) != 0 && lg != 0){
-quick.Sort(graph[0][n],cmp_ints)
+quick.Sort[int](graph[0][n],cmp_ints)
 }
 }
 graph[1] = make(map[int][]int) 

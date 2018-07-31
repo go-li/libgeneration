@@ -14,12 +14,12 @@ return 1
 } 
 for (len(add) >= capacity - 1){
 var newlyadded = add[0:capacity - 1:capacity - 1] 
-heap.Heapify(newlyadded,cmp)
+heap.Heapify[T](newlyadded,cmp)
 add = add[capacity - 1:] 
 if (len(newlyadded) > 0){
 var nod Node 
 nod.full_heap = newlyadded 
-tree.Append(heapTree,&h.full_heaps_tree,&nod,compareNode)
+tree.Append[T](heapTree,&h.full_heaps_tree,&nod,compareNode)
 }
 }
 var workcap int 
@@ -28,21 +28,21 @@ workcap = len(h.working_heap)
 }
 var exceed = workcap + len(add) - (capacity - 1) 
 if (exceed >= 0){
-heap.Insert(&h.working_heap,add[exceed:],cmp)
+heap.Insert[T](&h.working_heap,add[exceed:],cmp)
 if (exceed > 0){
 var nod Node 
 nod.full_heap = h.working_heap 
-tree.Append(heapTree,&h.full_heaps_tree,&nod,compareNode)
+tree.Append[T](heapTree,&h.full_heaps_tree,&nod,compareNode)
 h.working_heap = add[0:exceed:exceed] 
-heap.Heapify(h.working_heap,cmp)
+heap.Heapify[T](h.working_heap,cmp)
 }
 } else
 if (len(h.working_heap) > 0){
-heap.Insert(&h.working_heap,add,cmp)
+heap.Insert[T](&h.working_heap,add,cmp)
 } else
 {
 h.working_heap = add 
-heap.Heapify(add,cmp)
+heap.Heapify[T](add,cmp)
 }
 }
 
@@ -53,24 +53,24 @@ return -1
 }
 return 1
 } 
-var minnode *Node = tree.Find(heapTree,h.full_heaps_tree,nil) 
+var minnode *Node = tree.Find[T](heapTree,h.full_heaps_tree,nil) 
 if (minnode != nil){
-heap.Fix(minnode.full_heap,0,cmp)
-tree.Delete(heapTree,&h.full_heaps_tree,nil,func(_, b *Node)(int){
+heap.Fix[T](minnode.full_heap,0,cmp)
+tree.Delete[T](heapTree,&h.full_heaps_tree,nil,func(_, b *Node)(int){
 if (b == minnode){
 return 0
 }
 return -1
 })
-tree.Append(heapTree,&h.full_heaps_tree,minnode,compareNode)
+tree.Append[T](heapTree,&h.full_heaps_tree,minnode,compareNode)
 }
 if (len(h.working_heap) > 0){
-heap.Fix(h.working_heap,0,cmp)
+heap.Fix[T](h.working_heap,0,cmp)
 }
 }
 
 func Pop[T](h *Root, cmp func(*T, *T)(int))(ret *T){
-var minnode *Node = tree.Find(heapTree,h.full_heaps_tree,nil) 
+var minnode *Node = tree.Find[T](heapTree,h.full_heaps_tree,nil) 
 if ((minnode == nil) && (len(h.working_heap) == 0)){
 return nil
 }
@@ -87,16 +87,16 @@ q = &h.working_heap[0]
 *p = *q 
 *q = *temp 
 Fix[T](h,cmp)
-minnode = tree.Find(heapTree,h.full_heaps_tree,nil) 
+minnode = tree.Find[T](heapTree,h.full_heaps_tree,nil) 
 }
-ret = heap.Pop(&h.working_heap,cmp) 
+ret = heap.Pop[T](&h.working_heap,cmp) 
 h.length--
 if (len(h.working_heap) == 0){
 if (minnode == nil){
 return ret
 }
 h.working_heap = minnode.full_heap 
-tree.Delete(heapTree,&h.full_heaps_tree,nil,func(_, b *Node)(int){
+tree.Delete[T](heapTree,&h.full_heaps_tree,nil,func(_, b *Node)(int){
 if (b == minnode){
 return 0
 }
@@ -107,7 +107,7 @@ return ret
 }
 
 func Peek[T](h *Root, cmp func(*T, *T)(int))(ret *T){
-var minnode *Node = tree.Find(heapTree,h.full_heaps_tree,nil) 
+var minnode *Node = tree.Find[T](heapTree,h.full_heaps_tree,nil) 
 if ((minnode != nil) && (len(h.working_heap) > 0)){
 var res = cmp(&minnode.full_heap[0],&h.working_heap[0]) 
 if (res < 0){
@@ -127,18 +127,18 @@ return
 }
 
 func Heapify[T](h *Root, cmp func(*T, *T)(int)){
-heap.Heapify(h.working_heap,cmp)
-tree.Foreach(heapTree,h.full_heaps_tree,func(node *Node)(bool){
-heap.Heapify(node.full_heap,cmp)
+heap.Heapify[T](h.working_heap,cmp)
+tree.Foreach[T](heapTree,h.full_heaps_tree,func(node *Node)(bool){
+heap.Heapify[](node.full_heap,cmp)
 return true
 })
 }
 
 func Is[T](h *Root, cmp func(*T, *T)(int))(o bool){
 o = true 
-o = o && heap.Is(h.working_heap,cmp) 
-tree.Foreach(heapTree,h.full_heaps_tree,func(node *Node)(bool){
-o = o && heap.Is(node.full_heap,cmp) 
+o = o && heap.Is[T](h.working_heap,cmp) 
+tree.Foreach[T](heapTree,h.full_heaps_tree,func(node *Node)(bool){
+o = o && heap.Is[](node.full_heap,cmp) 
 return true
 })
 return o

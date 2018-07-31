@@ -12,7 +12,7 @@ vertex(at)
 visited[at] = struct{}{} 
 from = from[1:] 
 var add []int 
-graph.ForeachEdgeFrom(at,api,graph_data,func(i int, j int, d float64){
+graph.ForeachEdgeFrom[T](at,api,graph_data,func(i int, j int, d float64){
 if _, ok := visited[j] ;(ok){
 return 
 }

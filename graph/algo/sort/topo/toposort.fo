@@ -20,7 +20,7 @@ func Sort[T](api graph.Graph, graph_data *T)(out []int){
 var incoming []int 
 var visited_nodes = 0 
 var root intRoot 
-graph.ForeachEdge(api,graph_data,func(i int, j int, d float64){
+graph.ForeachEdge[T](api,graph_data,func(i int, j int, d float64){
 for (j >= len(incoming)){
 incoming = append(incoming,0) 
 }
@@ -32,21 +32,21 @@ incoming[j]++
 for i := range (incoming) {
 if (incoming[i] == 0){
 var sli = [1]int{i} 
-heap.Insert(&root,sli[0:],cmp_int)
+heap.Insert[T](&root,sli[0:],cmp_int)
 }
 }
 for {
-var ptr = heap.Pop(&root,cmp_int) 
+var ptr = heap.Pop[T](&root,cmp_int) 
 if (ptr == nil){
 return out
 }
 var u = *ptr 
 out = append(out,u) 
-graph.ForeachEdgeFrom(u,api,graph_data,func(_ int, j int, d float64){
+graph.ForeachEdgeFrom[T](u,api,graph_data,func(_ int, j int, d float64){
 incoming[j]--
 if (incoming[j] == 0){
 var sli = [1]int{j} 
-heap.Insert(&root,sli[0:],cmp_int)
+heap.Insert[int](&root,sli[0:],cmp_int)
 }
 })
 visited_nodes++
