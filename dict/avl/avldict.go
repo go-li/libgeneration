@@ -259,6 +259,20 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 		}
 	}
 
+	if p == *root && p != nil {
+		if linker(tree(p))[0] == nil {
+			if q == *root {
+				q = linker(tree(p))[1]	
+			}
+			*root = linker(tree(p))[1]
+		} else {
+			if q == *root {
+				q = linker(tree(p))[0]	
+			}
+			*root = linker(tree(p))[0]
+		}
+	}
+
 	linker(tree(p))[0] = nil
 	linker(tree(p))[1] = nil
 	linker(tree(p))[2] = nil
@@ -405,11 +419,6 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 			}
 		}
 	}
-/*
-	for linker(tree(*root))[0] != nil {
-		*root = linker(tree(*root))[0]
-	}
-*/
 	return result
 
 }
@@ -437,10 +446,34 @@ func Find(tree func(*) (*[3]*, *byte), root *, find func(*) byte) (f *) {
 		var dir byte
 		if find != nil {
 			dir = find(f)
+			if dir > 3 {
+				if dir >= 7 {
+					return nil
+				}
+				if dir == 6 {
+					return f
+				}
+				return (*children)[dir-3]
+			}
 		}
+
 		if (*children)[dir] == nil {
 			return f
 		}
 		f = (*children)[dir]
 	}
+}
+
+func InOrderSuccessor(tree func(*) (*[3]*, *byte), n *) * {
+	if( linker(tree(n))[1] != nil ) {
+		return Find(tree, linker(tree(n))[1], nil);
+	}
+
+	var p * ;
+	p = linker(tree(n))[2];
+	for p != nil && n == linker(tree(p))[1]  {
+		n = p;
+		p = linker(tree(p))[2];
+	}
+	return p;
 }
