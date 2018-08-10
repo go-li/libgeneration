@@ -10,6 +10,7 @@ type ApiDenseGraph interface {
 	Set(int, int, float64, *DataDenseGraph)
 	Modify(*DataDenseGraph)
 	Each(*DataDenseGraph, func(int))
+	Transpose(*DataDenseGraph)
 }
 
 type DataDenseGraph = struct {
@@ -18,6 +19,10 @@ type DataDenseGraph = struct {
 	lower    []byte
 	adds     map[[2]uint32]struct{}
 	dels     map[[2]uint32]struct{}
+}
+
+func (sg DenseGraph) Transpose(m *DataDenseGraph) {
+	m.lower, m.upper = m.upper, m.lower
 }
 
 func DenseGraphUndirectify1(m *DataDenseGraph) *DataDenseGraph {

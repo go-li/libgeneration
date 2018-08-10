@@ -8,6 +8,7 @@ Get (int, int, *DataDenseGraph)(float64, int)
 Set (int, int, float64, *DataDenseGraph)
 Modify (*DataDenseGraph)
 Each (*DataDenseGraph, func(int))
+Transpose (*DataDenseGraph)
 }
 
 type DataDenseGraph = struct{
@@ -16,6 +17,10 @@ diagonal []byte
 lower []byte
 adds map[[2]uint32]struct{}
 dels map[[2]uint32]struct{}
+}
+
+func (sg DenseGraph) Transpose(m *DataDenseGraph){
+m.lower, m.upper = m.upper, m.lower 
 }
 
 func DenseGraphUndirectify1(m *DataDenseGraph)(*DataDenseGraph){

@@ -8,6 +8,7 @@ type Graph interface {
 	Set(int, int, float64, *)
 	Modify(*)
 	Each(*, func(int))
+	Transpose(*)
 }
 
 func Dist(d float64, n int) float64 {
@@ -29,6 +30,7 @@ func HasEdge(d float64, _ int) bool {
 func ForeachEdge(g Graph, graph_data *, callback func (int, int, float64)) {
 
 	g.Each(graph_data, func(i int) {
+		const intmin = -int(^uint(0)>>1) - 1
 		var j = 0
 		var j2 = 0
 		var d float64
@@ -56,6 +58,8 @@ func ForeachEdge(g Graph, graph_data *, callback func (int, int, float64)) {
 }
 
 func ForeachEdgeFrom(i int, g Graph, graph_data *, callback func (int, int, float64)) {
+	const intmin = -int(^uint(0)>>1) - 1
+
 	var j = 0
 	var j2 = 0
 	var d float64

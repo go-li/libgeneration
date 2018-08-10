@@ -1,16 +1,7 @@
 package graph
 
+import "github.com/go-li/libgeneration/dict/avl"
 import "math"
-import "github.com/go-li/libgeneration/sort/quick"
-
-type adjacency = struct {
-	target   int
-	distance float64
-}
-
-func cmp_adj(a, b *adjacency) int {
-	return a.target - b.target
-}
 
 type SparseNet struct{}
 
@@ -20,14 +11,63 @@ type ApiSparseNet interface {
 	Set(int, int, float64, *DataSparseNet)
 	Modify(*DataSparseNet)
 	Each(*DataSparseNet, func(int))
+	Transpose(*DataSparseNet)
 }
 
-type DataSparseNet = [3]map[int][]adjacency
+func cmp0sa(a, b *edge_dist_node) int {
+	return a.fromto[0] - b.fromto[1]
+}
+func cmp1sa(a, b *edge_dist_node) int {
+	return a.fromto[1] - b.fromto[0]
+}
+
+
+func cmps0(a, b *edge_dist_node) (o int) {
+	o = a.fromto[0] - b.fromto[0]
+	if o == 0 {
+		o = a.fromto[1] - b.fromto[1]
+	}
+	return o
+}
+
+func cmps1(a, b *edge_dist_node) (o int) {
+	o = a.fromto[1] - b.fromto[1]
+	if o == 0 {
+		o = a.fromto[0] - b.fromto[0]
+	}
+	return o
+}
+
+func trees0(n *edge_dist_node) (*[3]*edge_dist_node, *byte) {
+	return &n.link[0], &n.bal[0]
+}
+
+func trees1(n *edge_dist_node) (*[3]*edge_dist_node, *byte) {
+	return &n.link[1], &n.bal[1]
+}
+
+type edge_dist_node struct {
+	link [2][3]*edge_dist_node
+	bal [2]byte
+	fromto [2]int
+	dist float64
+}
+
+type DataSparseNet = struct {
+	roots [2]*edge_dist_node
+	xor byte
+	adds map[[2]int]float64
+	dels map[[2]int]struct{}
+}
+
+func (sg SparseNet) Transpose(d *DataSparseNet) {
+	d.xor ^= 1
+}
 
 func (sg SparseNet) New(graph *DataSparseNet) *DataSparseNet {
 	if graph == nil {
-		graph = &DataSparseNet{make(map[int][]adjacency),
-			make(map[int][]adjacency), make(map[int][]adjacency)}
+		graph = &DataSparseNet{adds : make(map[[2]int]float64),
+					dels : make(map[[2]int]struct{})}
 	}
 	return graph
 }
@@ -35,71 +75,167 @@ func (sg SparseNet) New(graph *DataSparseNet) *DataSparseNet {
 func (sg SparseNet) Get(from, to int, graph *DataSparseNet) (float64, int) {
 	const intmin = -int(^uint(0)>>1) - 1
 
-	edges := graph[0][from]
-	for i := range edges {
-		if edges[i].target == to {
-			if i+1 >= len(edges) {
-				return edges[i].distance, intmin
-			}
-			return edges[i].distance, edges[i+1].target
+	var node edge_dist_node
+	node.fromto[graph.xor] = from
+	node.fromto[1^graph.xor] = to
+
+	var cmps = [2]func(a, b *edge_dist_node) (int) {cmps0, cmps1}
+	var linkers = [2]func (n *edge_dist_node) (*[3]*edge_dist_node, *byte) {trees0, trees1}
+
+	var found *edge_dist_node = avl.Find(linkers[graph.xor], graph.roots[graph.xor], func(e *edge_dist_node) byte {
+
+		var delta = cmps[graph.xor](e, &node)
+		if (delta == 0) {
+			return 6
 		}
-		if edges[i].target > to {
-			return math.Inf(1), edges[i].target
+
+		var r *edge_dist_node = e.link[graph.xor][0]
+		if r != nil {
+			for r.link[graph.xor][1] != nil {
+				r = r.link[graph.xor][1]
+			}
+		}
+
+		if (delta >= 0 && r == nil) || (delta >= 0 && cmps[graph.xor](r, &node) < 0) {
+			return 6
+		}
+
+
+
+		if (delta >= 0){
+			return 0
+		}
+
+		return 1
+	})
+	if found == nil {
+		return math.Inf(1), intmin
+	}
+
+
+	if (found.fromto[0] == node.fromto[0] && found.fromto[1] == node.fromto[1]) {
+		var next *edge_dist_node = avl.InOrderSuccessor(linkers[graph.xor], found)
+
+		if next == nil || next.fromto[graph.xor] != node.fromto[graph.xor] {
+			return found.dist, intmin
+		} else {
+			return found.dist, next.fromto[1^graph.xor]
 		}
 	}
+
+	if node.fromto[graph.xor] == found.fromto[graph.xor] {
+		return math.Inf(1), found.fromto[1^graph.xor]
+	}
+
 	return math.Inf(1), intmin
 }
 
 func (sg SparseNet) Set(from, to int, edge float64, graph *DataSparseNet) {
 	if math.IsNaN(edge) || math.IsInf(edge, 0) {
-		graph[2][from] = append(graph[2][from], adjacency{to, edge})
+		graph.dels[[2]int{from, to}] = struct{}{}
 	} else {
-		graph[1][from] = append(graph[1][from], adjacency{to, edge})
+		graph.adds[[2]int{from, to}] = edge
 	}
 }
+
 
 func (sg SparseNet) Modify(graph *DataSparseNet) {
 
-	for n, s := range graph[0] {
+	var cmps = [2]func(a, b *edge_dist_node) (int) {cmps0, cmps1}
+	var linkers = [2]func (n *edge_dist_node) (*[3]*edge_dist_node, *byte) {trees0, trees1}
 
-		deletion := graph[1][n]
+	for k := range graph.dels {
+		var node edge_dist_node
+		node.fromto[graph.xor] = k[0]
+		node.fromto[1^graph.xor] = k[1]
 
-		quick.Sort(deletion, cmp_adj)
+		var del1 *edge_dist_node = avl.Delete(linkers[graph.xor], &(graph.roots[graph.xor]), &node, cmps[graph.xor])
+		avl.Delete(linkers[1^graph.xor], &(graph.roots[1^graph.xor]), &node, cmps[1^graph.xor])
 
-		graph[1][n] = deletion
+		if del1 == nil {
+			print(k[0])
+			print(" ")
+			println(k[1])
+		} else {
 
-		s = sorted_sorted_delete(s, deletion, cmp_adj)
-
-		var temp adjacency
-		adaptive_sort(s, &temp, cmp_adj)
-
-		deletion = graph[2][n]
-
-		quick.Sort(deletion, cmp_adj)
-
-		s = sorted_sorted_delete(s, deletion, cmp_adj)
-
-		graph[0][n] = s
+			del1.fromto[0] = -1
+			del1.fromto[1] = -1
+		}
 	}
 
-	for n, s := range graph[1] {
+	for k, v := range graph.adds {
+		var node edge_dist_node
+		node.fromto[graph.xor] = k[0]
+		node.fromto[1^graph.xor] = k[1]
+		node.dist = v
 
-		var lg = len(graph[0][n])
+		var appended *edge_dist_node = avl.Append(linkers[graph.xor], &(graph.roots[graph.xor]), &node, cmps[graph.xor])
 
-		graph[0][n] = append(graph[0][n], s...)
-
-		if len(s) != 0 && lg != 0 {
-			quick.Sort(graph[0][n], cmp_adj)
+		if appended != &node {
+			appended.fromto = node.fromto
+			appended.dist = v
 		}
 
+		appended = avl.Append(linkers[1^graph.xor], &(graph.roots[1^graph.xor]), appended, cmps[1^graph.xor])
 	}
-	graph[1] = make(map[int][]adjacency)
-	graph[2] = make(map[int][]adjacency)
 
+	graph.dels = make(map[[2]int]struct{})
+	graph.adds = make(map[[2]int]float64)
 }
 
 func (sg SparseNet) Each(graph *DataSparseNet, callback func(int)) {
-	for i := range graph[0] {
-		callback(i)
+	const intmin = -int(^uint(0)>>1) - 1
+
+	var cmps = [2]func(a, b *edge_dist_node) (int) {cmp0sa, cmp1sa}
+	var linkers = [2]func (n *edge_dist_node) (*[3]*edge_dist_node, *byte) {trees0, trees1}
+
+	var node = intmin
+
+	if graph.roots[0] == nil || graph.roots[1] == nil {
+		return
 	}
+
+	var alpha *edge_dist_node = avl.Find(linkers[graph.xor], graph.roots[graph.xor], nil)
+	var beta *edge_dist_node = avl.Find(linkers[1^graph.xor], graph.roots[1^graph.xor], nil)
+
+	var cmp int
+
+	for alpha != nil && beta != nil {
+
+		cmp = cmps[graph.xor](alpha, beta)
+
+		if cmp < 0 {
+			if node < alpha.fromto[graph.xor] {
+				node = alpha.fromto[graph.xor]
+				callback(node)
+			}
+
+			alpha = avl.InOrderSuccessor(linkers[graph.xor], alpha)
+		} else {
+			if node < beta.fromto[1^graph.xor] {
+				node = beta.fromto[1^graph.xor]
+				callback(node)
+			}
+
+			beta = avl.InOrderSuccessor(linkers[1^graph.xor], beta)
+		}
+	}
+
+	for alpha != nil {
+		if node < alpha.fromto[graph.xor] {
+			node = alpha.fromto[graph.xor]
+			callback(node)
+		}
+
+		alpha = avl.InOrderSuccessor(linkers[graph.xor], alpha)
+	}
+	for beta != nil {
+		if node < beta.fromto[1^graph.xor] {
+			node = beta.fromto[1^graph.xor]
+			callback(node)
+		}
+
+		beta = avl.InOrderSuccessor(linkers[1^graph.xor], beta)
+	}
+
 }

@@ -6,6 +6,7 @@ Get (int, int, *T)(float64, int)
 Set (int, int, float64, *T)
 Modify (*T)
 Each (*T, func(int))
+Transpose (*T)
 }
 
 func Dist(d float64, n int)(float64){
@@ -26,6 +27,7 @@ return IsEdge(d)
 
 func ForeachEdge[T](g Graph, graph_data *T, callback func(int, int, float64)){
 g.Each(graph_data,func(i int){
+const intmin = -int(^uint(0) >> 1) - 1 
 var j = 0 
 var j2 = 0 
 var d float64 
@@ -48,6 +50,7 @@ j = j2
 }
 
 func ForeachEdgeFrom[T](i int, g Graph, graph_data *T, callback func(int, int, float64)){
+const intmin = -int(^uint(0) >> 1) - 1 
 var j = 0 
 var j2 = 0 
 var d float64 
