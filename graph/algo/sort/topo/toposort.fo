@@ -32,11 +32,11 @@ incoming[j]++
 for i := range (incoming) {
 if (incoming[i] == 0){
 var sli = [1]int{i} 
-heap.Insert[T](&root,sli[0:],cmp_int)
+heap.Insert[int](&root,sli[0:],cmp_int)
 }
 }
 for {
-var ptr = heap.Pop[T](&root,cmp_int) 
+var ptr = heap.Pop[int](&root,cmp_int) 
 if (ptr == nil){
 return out
 }

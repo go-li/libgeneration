@@ -36,7 +36,7 @@ var mul = 1
 if (dt && (len(sli) >= 2) && find(&sli[0],0,&sli[1],1) < 0){
 mul = -1 
 }
-return *Search[T](func(low *int, high *int)(*int, *int){
+return *Search[int](func(low *int, high *int)(*int, *int){
 if (*low + 2 >= *high){
 var avg = (*low & *high) + ((*low ^ *high) >> 1) 
 return nil, &avg

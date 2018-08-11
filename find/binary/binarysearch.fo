@@ -43,7 +43,7 @@ var mul = 1
 if (autodetect && (len(sli) > 0) && find(&sli[0],0) < 0){
 mul = -1 
 }
-return *Search[T](func(low *int, high *int)(*int){
+return *Search[int](func(low *int, high *int)(*int){
 if (*low == *high){
 return nil
 }
