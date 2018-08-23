@@ -177,7 +177,8 @@ return n
 /* |balancer(tree(w)) == 255| */
 
 /* Deletes from |tree| and returns an item matching |item|.
-   Returns a null pointer if no matching item found. */
+   Returns a null pointer if no matching item found.
+   |key| to delete cannot be already located in the tree, must be a copy. */
 func Delete[T](tree func(*T)(*[3]*T, *byte), root **T, key *T, cmp func(*T, *T)(int))(result *T){
 var p *T 
 var q *T 
@@ -188,6 +189,9 @@ panic("assert")
 if (*root == nil){
 return nil
 }
+linker[T](tree(key))[0] = *root 
+linker[T](tree(key))[1] = *root 
+linker[T](tree(key))[2] = *root 
 p = *root 
 for {
 var compare int = cmp(key,p) 
@@ -208,7 +212,7 @@ return nil
 result = p 
 q = linker[T](tree(p))[2] 
 if (q == nil){
-q = *root 
+q = key 
 dir = 0 
 }
 if (linker[T](tree(p))[1] == nil){
@@ -255,32 +259,18 @@ q = r
 dir = 0 
 }
 }
-if (p == *root && p != nil){
-if (linker[T](tree(p))[0] == nil){
-if (q == *root){
-q = linker[T](tree(p))[1] 
-}
-*root = linker[T](tree(p))[1] 
-} else
-{
-if (q == *root){
-q = linker[T](tree(p))[0] 
-}
-*root = linker[T](tree(p))[0] 
-}
-}
 linker[T](tree(p))[0] = nil 
 linker[T](tree(p))[1] = nil 
 linker[T](tree(p))[2] = nil 
 *balancer[T](tree(p)) = 0 
-for (q != *root){
+for (q != key){
 var y *T 
 y = q 
 if (linker[T](tree(y))[2] != nil){
 q = linker[T](tree(y))[2] 
 } else
 {
-q = *root 
+q = key 
 }
 if (dir == 0){
 if (linker[T](tree(q))[0] != y){
@@ -423,6 +413,7 @@ y = x
 }
 }
 }
+*root = linker[T](tree(key))[0] 
 return result
 }
 

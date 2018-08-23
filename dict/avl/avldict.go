@@ -175,9 +175,9 @@ func Append(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) * {
 
 
 /* Deletes from |tree| and returns an item matching |item|.
-   Returns a null pointer if no matching item found. */
+   Returns a null pointer if no matching item found.
+   |key| to delete cannot be already located in the tree, must be a copy. */
 func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (result *) {
-
 	var p *;
 	var q *; 
 	var dir int
@@ -189,6 +189,10 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 	if *root == nil {
 		return nil
 	}
+
+	linker(tree(key))[0] = *root
+	linker(tree(key))[1] = *root
+	linker(tree(key))[2] = *root
 
 	p = *root
 	for {
@@ -212,7 +216,7 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 
 	q = linker(tree(p))[2]
 	if q == nil {
-		q = *root
+		q = key
 		dir = 0
 	}
 
@@ -259,19 +263,7 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 		}
 	}
 
-	if p == *root && p != nil {
-		if linker(tree(p))[0] == nil {
-			if q == *root {
-				q = linker(tree(p))[1]	
-			}
-			*root = linker(tree(p))[1]
-		} else {
-			if q == *root {
-				q = linker(tree(p))[0]	
-			}
-			*root = linker(tree(p))[0]
-		}
-	}
+
 
 	linker(tree(p))[0] = nil
 	linker(tree(p))[1] = nil
@@ -280,14 +272,14 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 
 	//  tree.pavl_alloc.libavl_free (tree.pavl_alloc, p);
 
-	for q != *root {
+	for q != key {
 		var y *;
 		y = q
 
 		if linker(tree(y))[2] != nil {
 			q = linker(tree(y))[2]
 		} else {
-			q = *root
+			q = key
 		}
 
 		if dir == 0 {
@@ -419,6 +411,9 @@ func Delete(tree func(*) (*[3]*, *byte), root **, key *, cmp func(*,*) int) (res
 			}
 		}
 	}
+
+	*root = linker(tree(key))[0]
+
 	return result
 
 }
