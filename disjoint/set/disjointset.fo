@@ -1,0 +1,28 @@
+package set
+func Find[T](get func(*T)(*T), set func(*T, *T), cmp func(*T, *T)(int), i *T)(j *T){
+j = i 
+for (cmp(j,get(j)) != 0){
+j = get(j) 
+}
+for (cmp(i,get(i)) != 0){
+var tmp = get(i) 
+set(i,j)
+i = tmp 
+}
+return j
+}
+
+func Union[T](get func(*T)(*T), set func(*T, *T), cmp func(*T, *T)(int), a *T, b *T){
+a = Find[T](get,set,cmp,a) 
+b = Find[T](get,set,cmp,b) 
+var c = cmp(a,b) 
+if (c < 0){
+set(a,a)
+set(b,a)
+}
+if (c > 0){
+set(b,b)
+set(a,b)
+}
+}
+
