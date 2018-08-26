@@ -1,0 +1,38 @@
+package shuffle
+import "math/rand"
+func Order[T](slice []T, random func(int)(int)){
+var temp *T 
+if (len(slice) >= cap(slice)){
+var tmp []T 
+tmp = make([]T,1) 
+temp = &tmp[0] 
+} else
+{
+temp = &(slice[0:len(slice) + 1])[len(slice)] 
+}
+for (len(slice) > 0){
+n := len(slice) 
+randIndex := random(n) 
+var last *T 
+var any *T 
+last = &slice[n - 1] 
+any = &slice[randIndex] 
+*temp = *last 
+*last = *any 
+*any = *temp 
+slice = slice[0:n - 1] 
+}
+}
+
+func Random[T](slice []T){
+Order[T](slice,func(n int)(int){
+return rand.Intn(n)
+})
+}
+
+func Rand[T](slice []T, rand *rand.Rand){
+Order[T](slice,func(n int)(int){
+return rand.Intn(n)
+})
+}
+
